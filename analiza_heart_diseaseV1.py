@@ -13,7 +13,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
 import statsmodels.api as sm
 from scipy.stats import pearsonr, f_oneway, stats, shapiro, ttest_ind, levene, mannwhitneyu
-import shap
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly.io as pio
@@ -120,7 +119,6 @@ b)	wizualizacje
 c)	budowa modelu predykcyjnego
 
 7.	scikit-learn
-8.	shap
 
 Aplikacja webowa utworzona za pomocą frameworka Streamlit.
 
