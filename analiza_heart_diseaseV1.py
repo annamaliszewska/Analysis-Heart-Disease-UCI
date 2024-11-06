@@ -573,3 +573,6 @@ elif menu == "Modele predykcyjne":
         yaxis={'categoryorder': 'total ascending', 'automargin': True},
         font=dict(family=font_family, size=font_size))
     st.plotly_chart(fig_gb, use_container_width=True)
+
+    st.write("Dodatkowe kolumny na wykresie istotności cech wynikają z przekształcenia zmiennych kategorycznych, takich jak restecg i thal, na zmienne binarne (dummy variables), co tworzy nowe kolumny reprezentujące poszczególne kategorie tych zmiennych. Każda z tych kolumn ma własną istotność w modelu, dlatego pojawiają się na wykresie.")
+
