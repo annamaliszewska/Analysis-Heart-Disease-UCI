@@ -85,20 +85,24 @@ Po zidentyfikowaniu istotnych różnic w poziomie cholesterolu między płciami 
 Wyniki tej analizy pokazały, że zależność mięzy stężeniem cholesterolu a ciśnieniem krwi jest bardzo słaba (współczynnik korelacji Spearmana wynosi 0.0986).
 Ponadto p-wartość na poziomie 0.0027 pokazuje, że istnieje istotny statystycznie, ale słaby związek między obiema zmiennymi. Oznacza to, że związek między tymi zmiennymi od strony praktycznej nie ma dużego znaczenia. 
 
-W drugiej części analizy utworzono modele predykcyjne dotyczące wystąpenia choroby. Analiza wyników (porównanie metryk) wskazuje, że najlepszymi modelami są Gradient Boosting i Random Forest.
+W drugiej części niniejszej analizy porównano 5 modeli predykcyjnych, które reprezentują różne podejścia do klasyfikacji. Każdy ma unikalne właściwości, które moją wpływać na skuteczność predykcji w zależności od rodzaju danych. Zwłaszcza modele regresji logistycznej, Random Forest czy Gradient Boosting są powszechnie stosowane w klasyfikacji. Modele różnią się między sobą pod względem optymalizacji czy interpretowalności. Dzięki ich porównaniu można lepiej zrozumieć, który model najlepiej radzi sobie z przewidywaniem wystąpienia choroby serca na podstawie wykorzystanego zbioru danych.
+W tym porównaniu najlepszym modelem okazał się Gradient Boosting, osiągając najwyższe wyniki we wszystkich kluczowych metrykach, zwłaszcza pod względem dokładności, czułości i F1-score dla klasy 1. Model ten najlepiej identyfikuje przypadki chorobowe, jest skuteczny w przewidywaniu i rzadko pomija przypadki choroby.
+Drugim najlepszym modelem okazał się Random Forest, który również osiągnął wysokie wyniki i jest zbliżony do Gradient Boosting. Random Forest jest bardzo skuteczny w wykrywaniu przypadków chorobowych, z dobrą precyzją i czułością, choć jego dokładność jest nieco niższa niż Gradient Boosting.
+Umiarkowaną skuteczność wykazał model regresji logistycznej (Logistic Regression), a najsłabsze okazały się SVM i K-Nearest Neighbors, zwłaszcza pod kątem dokładności i czułości, przez co są mniej odpowiednie dla analizy tego zbioru danych bez odpowiedniej optymalizacji parametrów.
+Na końcu zamieszczono również wykresy przedstawiające istotność cech dla dwóch najlepszych modeli - Gradient Boosting i Random Forest, które pozwalają zrozumieć, które zmienne mają największy wpływ na przewidywania modelu.
 
 Wykresy wykorzystane w analizie:
 
-1. histogram – przedstawienie rozkładu jednej zmiennej numerycznej, np. rozkład wieku w zależności od płci (sprawdzenie, czy wartości są symetryczne – czy rozkład jest normalny, czy asymetryczny)
-2. wykres rozrzutu (scatter plot, wykres punktowy) – przedstawienie zależności między dwiema zmiennymi numerycznymi np. sprawdzenie zależności liniowej między wiekiem a poziomem cholesterolu; każdy punkt na wykresie reprezentuje jedną obserwację, a osie pokazują wartości dla wieku i poziomu cholesterolu (czy wraz z wiekiem rośnie cholesterol, czy brak takiego trendu)
-3. wykres słupkowy (bar plot) – pozwala na porównanie liczby pacjentów w różnych grupach; może to pomóc w identyfikacji, która płeć lub grupa wiekowa jest bardziej narażona np. na wysoki cholesterol (pokazanie różnic w częstości występowania określonego czynnika w różnych grupach)
-4. skumulowany wykres gęstości – porównanie rozkładów zmiennych między grupami
+1. histogram 
+2. wykres rozrzutu (scatter plot, wykres punktowy) 
+3. wykres słupkowy (bar plot) 
+4. skumulowany wykres gęstości
 
 Ponadto do modelu predykcyjnego:
 
 5. wykres radarowy
 6. macierz błędów
-7. raport klasyfikacji (tabela tekstowa) – przedstawia szczegółowy wgląd w wydajność modelu, pozwala ocenić, jak dobrze model radzi sobie z przewidywaniem każdej z klas (precyzja, czułość, f1-score dla każdej z klas)
+7. raport klasyfikacji (tabela tekstowa)
 
 Dzięki zastosowaniu tych różnych typów wykresów oraz tabeli można uzyskać pełny obraz analizowanych danych, zarówno w aspekcie statystycznym, jak i wizualnym, co ułatwia wyciąganie wniosków i podejmowanie decyzji w ramach projektu.
 
@@ -116,7 +120,7 @@ b)	wizualizacje
 5.	seaborn
 6.	plotly
 
-c)	budowa modelu predykcyjnego
+c)	modele predykcyjne
 
 7.	scikit-learn
 
@@ -495,3 +499,77 @@ elif menu == "Modele predykcyjne":
                            x=['Negatyw', 'Pozytyw'], y=['Negatyw', 'Pozytyw'])
         cm_fig.update_layout(title=f"Macierz błędów - {model_name}")
         st.plotly_chart(cm_fig, use_container_width=True)
+
+    # przedstawienie istotności cech w dwóch najlepszych modelach
+    # tworzenie zmiennej docelowej i wybór cech
+    df['target'] = (df['num'] > 0).astype(int)
+    features = ['age', 'sex', 'trestbps', 'chol', 'fbs'] + df.columns[df.columns.str.startswith('restecg')].tolist() + \
+               df.columns[df.columns.str.startswith('thal')].tolist()
+    X = df[features]
+    y = df['target']
+
+    # wypełnianie braków medianą i podział na zbiory
+    X = X.fillna(X.median())
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # trenowanie modelu Random Forest
+    rf_model = RandomForestClassifier(random_state=42)
+    rf_model.fit(X_train, y_train)
+    rf_importances = rf_model.feature_importances_
+
+    # trenowanie modelu Gradient Boosting
+    gb_model = GradientBoostingClassifier(random_state=42)
+    gb_model.fit(X_train, y_train)
+    gb_importances = gb_model.feature_importances_
+
+    # tworzenie data frame dla istotności cech
+    rf_features_df = pd.DataFrame({
+        'Feature': X.columns,
+        'Importance': rf_importances
+    }).sort_values(by='Importance', ascending=False)
+
+    gb_features_df = pd.DataFrame({
+        'Feature': X.columns,
+        'Importance': gb_importances
+    }).sort_values(by='Importance', ascending=False)
+
+    # ustawienie palety kolorów
+    magenta_color = '#cc6699'
+
+    # ustawienia czcionki
+    font_family = "Arial"
+    font_size = 12
+
+    # wykres istotności cech dla Random Forest
+    st.subheader("Istotność cech - Random Forest")
+    fig_rf = go.Figure(go.Bar(
+        x=rf_features_df['Importance'],
+        y=rf_features_df['Feature'],
+        orientation='h',
+        marker_color=magenta_color
+    ))
+    fig_rf.update_layout(
+        title="Istotność cech w modelu Random Forest",
+        xaxis_title="Istotność",
+        yaxis_title="Cechy",
+        yaxis={'categoryorder': 'total ascending', 'automargin': True},
+
+        font=dict(family=font_family, size=font_size)
+    )
+    st.plotly_chart(fig_rf, use_container_width=True)
+
+    # wykres istotności cech dla Gradient Boosting
+    st.subheader("Istotność cech - Gradient Boosting")
+    fig_gb = go.Figure(go.Bar(
+        x=gb_features_df['Importance'],
+        y=gb_features_df['Feature'],
+        orientation='h',
+        marker_color=magenta_color
+    ))
+    fig_gb.update_layout(
+        title="Istotność cech w modelu Gradient Boosting",
+        xaxis_title="Istotność",
+        yaxis_title="Cechy",
+        yaxis={'categoryorder': 'total ascending', 'automargin': True},
+        font=dict(family=font_family, size=font_size))
+    st.plotly_chart(fig_gb, use_container_width=True)
