@@ -354,7 +354,7 @@ elif menu == "Statystyki":
     # wykres punktowy dla korelacji Spearmana
     fig = px.scatter(df, x='chol', y='trestbps', trendline="ols",
                      labels={'chol': 'Cholesterol', 'trestbps': 'Spoczynkowe ciśnienie krwi'},
-                     title='Interaktywny wykres cholesterolu i ciśnienia krwi z linią regresji')
+                     title='Wykres cholesterolu i ciśnienia krwi z linią regresji')
 
     fig.update_layout(width=600, height=400)
     st.plotly_chart(fig, use_container_width=True)
