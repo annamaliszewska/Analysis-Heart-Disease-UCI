@@ -12,7 +12,7 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import classification_report, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
 import statsmodels.api as sm
-from scipy.stats import pearsonr, f_oneway, stats, shapiro, ttest_ind, levene, mannwhitneyu
+from scipy.stats import pearsonr, f_oneway, stats, shapiro, ttest_ind, levene, mannwhitneyu, spearmanr
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly.io as pio
@@ -77,15 +77,15 @@ description_text = """
 Analiza obejmuje różne statystyki, które mogą pomóc w lepszym zrozumieniu oraz przewidywaniach dotyczących chorób serca. Wnioski mogą być przydatne w zrozumieniu struktury demograficznej badanej grupy, czy zbadaniu potencjalnego związku między wiekiem czy płcią a występowaniem choroby serca. 
 Analiza została przeprowadzona na zbiorze UCI Heart Disease, który obejmuje 920 rekordów i jest popularnym, darmowym zbiorem ćwiczeniowym.
 
-W pierwszej części analizy przedstawiono podstawowe statystyki, takie jak m.in. udział kobiet i mężczyzn, jak również zaprezentowano rozkład wieku dla poszczególnych płci. Ponadto wykreślono histogramy przedstawiające średnie wartości ciśnienia tętniczego i poziomu cholesterolu z podziałem na płeć.
+W pierwszej części analizy przedstawiono podstawowe statystyki, takie jak m.in. udział kobiet i mężczyzn, jak również zaprezentowano rozkład wieku dla poszczególnych płci. Ponadto przedstawiono wykresy skumulowane gęstości rozkładu wartości ciśnienia tętniczego skurczowego i stężenia cholesterolu z podziałem na płeć.
 
 Następnie przeprowadzono także testy normalności i jednorodności wariancji (Shapiro-Wilka i Levene'a) wobec zmiennych trestbps (spoczynkowe ciśnienie tętnicze) i chol (cholesterol), które wykazały, że obie zmienne nie spełniają założeń normalności rozkładu, a zmienna chol nie spełnia również jednorodności wariancji.
 Wobec tego zdecydowano się przeprowadzić test nieparametryczny Manna-Whitneya, który wykazał istotną różnicę w poziomie cholesterolu między płciami, ale brak istotnej różnicy dla ciśnienia tętniczego.
-Po zidentyfikowaniu istotnych różnic w poziomie cholesterolu między płciami za pomocą testu Manna-Whitneya, przeprowadzono analizę regresji liniowej celem sprawdzenia czy istnieje związek między cholesterolem a ciśnieniem (czy wyższy poziom cholesterolu wpływa na ciśnienie krwi). 
-Model wyjaśnia jedynie 0.8% wariancji w ciśnieniu krwi (trestbps), co sugeruje, że poziom cholesterolu praktycznie nie wpływa na wyjaśnianie zmienności ciśnienia tętniczego. Z kolei p-wartość na poziomie 0.007 wskazuje, że istnieje statystycznie istotny, choć niewielki, związek między poziomem cholesterolu a spoczynkowym ciśnieniem krwi. Wartość współczynnika (0.0151) oznacza, że przy wzroście cholesterolu o 1 mg/dl, ciśnienie krwi wzrasta o około 0.015 mm Hg. 
-Ze względu na bardzo niską wartość R-kwadrat podjęto analizę korelacji za pomocą współczynnika korelacji Pearsona, która pokazała siłę i kierunek związku między tymi zmiennymi. 
+Po zidentyfikowaniu istotnych różnic w poziomie cholesterolu między płciami za pomocą testu Manna-Whitneya, przeprowadzono analizę korelacji Spearmana celem sprawdzenia czy istnieje monotoniczna zależność między cholesterolem a ciśnieniem (czy wzrost lub spadek cholesterolu wpływa na wzrost lub spadek ciśnienie krwi) dla poszczególnych grup (płci). 
+Wyniki tej analizy pokazały, że zależność mięzy stężeniem cholesterolu a ciśnieniem krwi jest bardzo słaba (współczynnik korelacji Spearmana wynosi 0.0986).
+Ponadto p-wartość na poziomie 0.0027 pokazuje, że istnieje istotny statystycznie, ale słaby związek między obiema zmiennymi. Oznacza to, że związek między tymi zmiennymi od strony praktycznej nie ma dużego znaczenia. 
 
-W drugiej części analizy utworzono modele predykcyjne dotyczące wystąpenia choroby. Analiza wyników wskazuje, że najlepszymi modelami są Gradient Boosting i Random Forest.
+W drugiej części analizy utworzono modele predykcyjne dotyczące wystąpenia choroby. Analiza wyników (porównanie metryk) wskazuje, że najlepszymi modelami są Gradient Boosting i Random Forest.
 
 Wykresy wykorzystane w analizie:
 
@@ -96,10 +96,10 @@ Wykresy wykorzystane w analizie:
 
 Ponadto do modelu predykcyjnego:
 
-5.	histogram rozkładu predykcji modelu - histogram przedstawiający liczbę obserwacji przypisanych do każdej z klas przez model predykcyjny (0 – brak choroby, 1 – choroba); pokazuje liczbę przypadków zaklasyfikowanych do danej klasy przez model i ułatwia ocenę, czy model równomiernie klasyfikuje przypadki i jak często przewiduje każdą z klas
-6.	histogram gęstości rozkładu prawdopodobieństwa - pokazuje jakie prawdopodobieństwa model przypisuje do poszczególnych przypadków. Umożliwia ocenę pewności modelu w swoich predykcjach; pomaga zrozumieć, jak pewny jest model w swoich przewidywaniach oraz czy większość przypadków jest przewidywana z dużą pewnością
-7.	wykres słupkowy istotności cech – pokazuje cechy w zależności od ich wpływu na przewidywanie zmiennej docelowej (choroba serca)
-8.	raport klasyfikacji (tabela tekstowa) – przedstawia szczegółowy wgląd w wydajność modelu, pozwala ocenić, jak dobrze model radzi sobie z przewidywaniem każdej z klas (precyzja, czułość, f1-score dla każdej z klas)
+5. wykres radarowy
+6. macierz błędów
+7. raport klasyfikacji (tabela tekstowa) – przedstawia szczegółowy wgląd w wydajność modelu, pozwala ocenić, jak dobrze model radzi sobie z przewidywaniem każdej z klas (precyzja, czułość, f1-score dla każdej z klas)
+
 Dzięki zastosowaniu tych różnych typów wykresów oraz tabeli można uzyskać pełny obraz analizowanych danych, zarówno w aspekcie statystycznym, jak i wizualnym, co ułatwia wyciąganie wniosków i podejmowanie decyzji w ramach projektu.
 
 Wykorzystane biblioteki i funkcje:
@@ -107,8 +107,8 @@ Wykorzystane biblioteki i funkcje:
 a)	obliczenia
 
 1.	pandas 
-2.	statsmodels (OLS, anova)
-3.	scipy (pearsonr, shapiro)
+2.	statsmodels
+3.	scipy
 
 b)	wizualizacje
 
@@ -340,29 +340,52 @@ elif menu == "Statystyki":
     st.write(
         f"Ciśnienie tętnicze: statystyka = {mannwhitney_trestbps.statistic:.4f}, p-wartość = {mannwhitney_trestbps.pvalue:.4f}")
 
-    # analiza regresji i korelacji
-    st.subheader("Analiza regresji liniowej")
-    X = df['chol']
-    y = df['trestbps']
-    X = sm.add_constant(X)
-    model = sm.OLS(y, X).fit()
-    st.write(model.summary())
+    # analiza korelacji Spearmana
+    st.subheader("Analiza korelacji Spearmana między stężeniem cholesterolu a ciśnieniem krwi")
+    st.subheader("Analiza korelacji bez podziału na grupy")
+    spearman_corr, spearman_p_value = spearmanr(df['chol'], df['trestbps'])
+    st.write(f"Współczynnik korelacji Spearmana: {spearman_corr:.4f}")
+    st.write(f"p-wartość: {spearman_p_value:.4f}")
 
-    # predykcja wartości na podstawie modelu
-    df['predicted_trestbps'] = model.predict(X)
-
-    # wykres regresji
-    fig = px.scatter(df, x='chol', y='trestbps',
+    # wykres punktowy dla korelacji Spearmana
+    fig = px.scatter(df, x='chol', y='trestbps', trendline="ols",
                      labels={'chol': 'Cholesterol', 'trestbps': 'Spoczynkowe ciśnienie krwi'},
-                     title='Zależność między cholesterolem a spoczynkowym ciśnieniem krwi')
-    fig.add_scatter(x=df['chol'], y=df['predicted_trestbps'], mode='lines', name='Linia regresji')
+                     title='Interaktywny wykres cholesterolu i ciśnienia krwi z linią regresji')
+
+    fig.update_layout(width=600, height=400)
     st.plotly_chart(fig, use_container_width=True)
 
-    # analiza korelacji Pearsona
-    correlation, p_value = pearsonr(df['chol'], df['trestbps'])
-    st.subheader("Analiza korelacji między cholesterolem a ciśnieniem krwi")
-    st.write(f"Współczynnik korelacji Pearsona: {correlation:.4f}")
-    st.write(f"p-wartość: {p_value:.4f}")
+    # podział danych na grupy według płci
+    df_men = df[df['sex'] == 1]  # Mężczyźni
+    df_women = df[df['sex'] == 0]  # Kobiety
+
+    spearman_corr_men, p_value_men = spearmanr(df_men['chol'], df_men['trestbps'])
+    spearman_corr_women, p_value_women = spearmanr(df_women['chol'], df_women['trestbps'])
+
+    # wyświetlenie wyników
+    st.subheader("Analiza korelacji z podziałem na płeć")
+
+    st.write(f"**Mężczyźni** - Współczynnik korelacji Spearmana: {spearman_corr_men:.4f}, p-wartość: {p_value_men:.4f}")
+    st.write(
+        f"**Kobiety** - Współczynnik korelacji Spearmana: {spearman_corr_women:.4f}, p-wartość: {p_value_women:.4f}")
+
+
+    # wykres dla mężczyzn
+    fig_men = px.scatter(df_men, x='chol', y='trestbps', trendline="ols",
+                         labels={'chol': 'Cholesterol', 'trestbps': 'Spoczynkowe ciśnienie krwi'},
+                         title='Korelacja cholesterolu i ciśnienia krwi - Mężczyźni')
+    fig_men.update_traces(marker=dict(color='blue'), selector=dict(mode='markers'))
+    fig_men.update_layout(width=600, height=400)
+
+    # wykres dla kobiet
+    fig_women = px.scatter(df_women, x='chol', y='trestbps', trendline="ols",
+                           labels={'chol': 'Cholesterol', 'trestbps': 'Spoczynkowe ciśnienie krwi'},
+                           title='Korelacja cholesterolu i ciśnienia krwi - Kobiety')
+    fig_women.update_traces(marker=dict(color='pink'), selector=dict(mode='markers'))
+    fig_women.update_layout(width=600, height=400)
+    st.plotly_chart(fig_men, use_container_width=True)
+    st.plotly_chart(fig_women, use_container_width=True)
+
 
 # modele predykcyjne
 elif menu == "Modele predykcyjne":
