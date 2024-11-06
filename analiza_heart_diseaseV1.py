@@ -241,7 +241,7 @@ elif menu == "Statystyki":
 
     col3, col4 = st.columns(2)
     with col3:
-        st.subheader("Rozkład ciśnienia tętniczego z podziałem na płeć")
+        st.subheader("Rozkład ciśnienia tętniczego skurczowego z podziałem na płeć")
         fig_trestbps = go.Figure()
 
         fig_trestbps.add_trace(go.Histogram(
@@ -263,7 +263,7 @@ elif menu == "Statystyki":
         ))
 
         fig_trestbps.update_layout(
-            title='Skumulowany rozkład ciśnienia tętniczego z podziałem na płeć',
+            title='Skumulowany rozkład ciśnienia tętniczego skurczowego z podziałem na płeć',
             xaxis_title='Spoczynkowe ciśnienie krwi (trestbps)',
             yaxis_title='Gęstość',
             barmode='overlay'
@@ -272,7 +272,7 @@ elif menu == "Statystyki":
         st.plotly_chart(fig_trestbps, use_container_width=True)
 
     with col4:
-        st.subheader("Rozkład poziomu cholesterolu z podziałem na płeć")
+        st.subheader("Rozkład stężenia cholesterolu z podziałem na płeć")
         fig_chol = go.Figure()
 
         fig_chol.add_trace(go.Histogram(
@@ -294,8 +294,8 @@ elif menu == "Statystyki":
         ))
 
         fig_chol.update_layout(
-            title='Skumulowany rozkład poziomu cholesterolu z podziałem na płeć',
-            xaxis_title='Poziom cholesterolu (chol)',
+            title='Skumulowany rozkład stężenia cholesterolu z podziałem na płeć',
+            xaxis_title='Stężenie cholesterolu (chol)',
             yaxis_title='Gęstość',
             barmode='overlay'
         )
