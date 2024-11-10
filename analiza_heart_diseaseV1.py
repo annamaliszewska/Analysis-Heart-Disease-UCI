@@ -41,7 +41,7 @@ df = pd.get_dummies(df, columns=['restecg', 'thal'], drop_first=True)
 df['target'] = (df['num'] > 0).astype(int)  # 1 dla choroby, 0 dla braku choroby
 
 # tytuł całej analizy (dashboardu)
-st.title("Analiza danych dotyczących chorób serca")
+st.title("Analiza danych dotyczących chorób układu sercowo-naczyniowego")
 
 # instrukcja do obsługi menu
 st.write("Wybierz sekcję z menu, aby zobaczyć szczegóły.")
@@ -79,17 +79,16 @@ Analiza została przeprowadzona na zbiorze UCI Heart Disease, który obejmuje 92
 
 W pierwszej części analizy przedstawiono podstawowe statystyki, takie jak m.in. udział kobiet i mężczyzn, jak również zaprezentowano rozkład wieku dla poszczególnych płci. Ponadto przedstawiono wykresy skumulowane gęstości rozkładu wartości ciśnienia tętniczego skurczowego i stężenia cholesterolu z podziałem na płeć.
 
-Następnie przeprowadzono także testy normalności i jednorodności wariancji (Shapiro-Wilka i Levene'a) wobec zmiennych trestbps (spoczynkowe ciśnienie tętnicze) i chol (cholesterol), które wykazały, że obie zmienne nie spełniają założeń normalności rozkładu, a zmienna chol nie spełnia również jednorodności wariancji.
+W celu oceny związku między stężeniem cholesterolu całkowitego we krwi, a wartościami ciśnienia tętniczego skurczowego przeprowadzono także testy normalności i jednorodności wariancji (Shapiro-Wilka i Levene'a) wobec zmiennych trestbps (spoczynkowe ciśnienie tętnicze) i chol (cholesterol), które wykazały, że obie zmienne nie spełniają założeń normalności rozkładu, a zmienna chol nie spełnia również jednorodności wariancji.
 Wobec tego zdecydowano się przeprowadzić test nieparametryczny Manna-Whitneya, który wykazał istotną różnicę w poziomie cholesterolu między płciami, ale brak istotnej różnicy dla ciśnienia tętniczego.
 Po zidentyfikowaniu istotnych różnic w poziomie cholesterolu między płciami za pomocą testu Manna-Whitneya, przeprowadzono analizę korelacji Spearmana celem sprawdzenia czy istnieje monotoniczna zależność między cholesterolem a ciśnieniem (czy wzrost lub spadek cholesterolu wpływa na wzrost lub spadek ciśnienie krwi) dla poszczególnych grup (płci). 
 Wyniki tej analizy pokazały, że zależność mięzy stężeniem cholesterolu a ciśnieniem krwi jest bardzo słaba (współczynnik korelacji Spearmana wynosi 0.0986).
 Ponadto p-wartość na poziomie 0.0027 pokazuje, że istnieje istotny statystycznie, ale słaby związek między obiema zmiennymi. Oznacza to, że związek między tymi zmiennymi od strony praktycznej nie ma dużego znaczenia. 
 
-W drugiej części niniejszej analizy porównano 5 modeli predykcyjnych, które reprezentują różne podejścia do klasyfikacji. Każdy ma unikalne właściwości, które moją wpływać na skuteczność predykcji w zależności od rodzaju danych. Zwłaszcza modele regresji logistycznej, Random Forest czy Gradient Boosting są powszechnie stosowane w klasyfikacji. Modele różnią się między sobą pod względem optymalizacji czy interpretowalności. Dzięki ich porównaniu można lepiej zrozumieć, który model najlepiej radzi sobie z przewidywaniem wystąpienia choroby serca na podstawie wykorzystanego zbioru danych.
-W tym porównaniu najlepszym modelem okazał się Gradient Boosting, osiągając najwyższe wyniki we wszystkich kluczowych metrykach, zwłaszcza pod względem dokładności, czułości i F1-score dla klasy 1. Model ten najlepiej identyfikuje przypadki chorobowe, jest skuteczny w przewidywaniu i rzadko pomija przypadki choroby.
+W drugiej części niniejszej analizy porównano 5 najpopularniejszych modeli predykcyjnych (klasyfikacyjnych), celem sprawdzenia, które z nich są najbardziej optymalne dla badanego zbioru danych. W tym porównaniu najlepszym modelem okazał się Gradient Boosting, osiągając najwyższe wyniki we wszystkich kluczowych metrykach, zwłaszcza pod względem dokładności, czułości i F1-score dla klasy 1. Model ten najlepiej identyfikuje przypadki chorobowe, jest skuteczny w przewidywaniu i rzadko pomija przypadki choroby.
 Drugim najlepszym modelem okazał się Random Forest, który również osiągnął wysokie wyniki i jest zbliżony do Gradient Boosting. Random Forest jest bardzo skuteczny w wykrywaniu przypadków chorobowych, z dobrą precyzją i czułością, choć jego dokładność jest nieco niższa niż Gradient Boosting.
-Umiarkowaną skuteczność wykazał model regresji logistycznej (Logistic Regression), a najsłabsze okazały się SVM i K-Nearest Neighbors, zwłaszcza pod kątem dokładności i czułości, przez co są mniej odpowiednie dla analizy tego zbioru danych bez odpowiedniej optymalizacji parametrów.
-Na końcu zamieszczono również wykresy przedstawiające istotność cech dla dwóch najlepszych modeli - Gradient Boosting i Random Forest, które pozwalają zrozumieć, które zmienne mają największy wpływ na przewidywania modelu.
+Umiarkowaną skuteczność wykazał model regresji logistycznej (Logistic Regression), a najsłabsze okazały się SVM i K-Nearest Neighbors, zwłaszcza pod kątem dokładności i czułości, przez co są mniej odpowiednie dla analizy tego zbioru danych bez odpowiedniej optymalizacji parametrów. Ponadto dla każdego z modeli utworzono macierz błędów.
+Na końcu zamieszczono również wykresy dla dwóch najlepszych modeli (Gradient Boosting i Random Forest) przedstawiające istotność cech, które pozwalają ustalić, które zmienne mają największy wpływ na przewidywania wystąpienia choroby układu sercowo-naczyniowego w badanej populacji.
 
 Wykresy wykorzystane w analizie:
 
@@ -103,8 +102,6 @@ Ponadto do modelu predykcyjnego:
 5. wykres radarowy
 6. macierz błędów
 7. raport klasyfikacji (tabela tekstowa)
-
-Dzięki zastosowaniu tych różnych typów wykresów oraz tabeli można uzyskać pełny obraz analizowanych danych, zarówno w aspekcie statystycznym, jak i wizualnym, co ułatwia wyciąganie wniosków i podejmowanie decyzji w ramach projektu.
 
 Wykorzystane biblioteki i funkcje:
 
